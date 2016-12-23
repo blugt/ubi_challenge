@@ -1,0 +1,41 @@
+{
+  "name": "ubi_challenge",
+  "version": "1.0.0",
+  "description": "ubiwhere challenge project.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blugt/ubi_challenge.git"
+  },
+  "keywords": [
+    "angular",
+    "node"
+  ],
+  "author": "Telmo Alves",
+  "license": "ISC",
+  "dependencies": {
+    "@angular/common": "^2.4.1",
+    "@angular/core": "^2.4.1",
+    "@angular/forms": "^2.4.1",
+    "@angular/http": "^2.4.1",
+    "@angular/platform-browser": "^2.4.1",
+    "@angular/router": "^3.4.1",
+    "angular2": "^2.0.0-beta.21",
+    "body-parser": "^1.15.0",
+    "bootstrap-sass": "^3.3.7",
+    "cors": "^2.7.1",
+    "express": "^4.13.4",
+    "fs": "0.0.2",
+    "lodash": "^4.6.1",
+    "node-uuid": "^1.4.7",
+    "rxjs": "^5.0.1",
+    "zone.js": "^0.7.2"
+  },
+  "bugs": {
+    "url": "https://github.com/blugt/ubi_challenge/issues"
+  },
+  "homepage": "https://github.com/blugt/ubi_challenge#readme"
+}
