@@ -2,6 +2,18 @@
     "compilerOptions": {
         "target": "es5",
         "experimentalDecorators": true,
-        "outDir": "./dist"
-    }
+        "emitDecoratorMetadata": true,
+        "module": "commonjs",
+        "typeRoots": [
+            "./node_modules/typings/"
+        ],
+        "types": [
+            "core-js"
+        ]
+    },
+    "exclude": [
+        "node_modules",
+        "typings/main",
+        "typings/main.d.ts"
+    ]
 }

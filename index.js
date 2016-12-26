@@ -18,12 +18,16 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 
+app.use("/dist", express.static(__dirname + '/dist'));
 var port = process.env.PORT || 8080;        // set our port
 
 // ROUTES FOR OUR API
 // =============================================================================
 var router = express.Router();              // get an instance of the express Router
 
+app.get('/', function(req, res){
+    res.sendfile('index.html', { root: __dirname } );
+});
 
 /*
  *  GET ALL USERS FROM BD
@@ -104,6 +108,7 @@ router.delete('/users/:id', function(req, res) {
  */
 
 router.get('/songs', function(req, res) {
+    console.log('song list was requested'); 
     res.statusCode = 200;
 	res.send(songs);
 });

@@ -13,10 +13,10 @@ var data = {
 		"username" : "Test",
 		"email" : "test@ubiwhere.com",
 	}],
-	musics: [{
+	songs: [{
 		"id": 1,
 		"album" : "nirvana",
-		"artist" : "nirlvana",
+		"artist" : "nirvana",
 		"track" : "nirvana"
 	},
 	{

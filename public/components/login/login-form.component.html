@@ -1,3 +1,8 @@
 <section>
-    <form ></form>
+    <form >
+        <label for="email">Email</label>
+        <input name="email" type="email" [(ngModel)]="user.email">
+        <button (click)="userLogin()">LOGIN</button>
+        <button (click)="userLogout()" *ngIf="isLogged">LOGOUT</button>
+    </form>
 </section>

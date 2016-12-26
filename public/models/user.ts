@@ -1,11 +1,11 @@
 export class User {
     id: Number;
     username: String;
-    password: String;
+    email: String;
 
-    constructor(id: Number, uname: String, pword: String){
+    constructor(id: Number, uname: String, email: String){
         this.id = id;
         this.username = uname;
-        this.password = pword;
+        this.email = email;
     }
 }

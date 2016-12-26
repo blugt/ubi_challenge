@@ -1,19 +1,27 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SongComponent } from './song.component';
-import { SongService } from './song.service';
+import { SongService } from './../../services/song.service';
+import { Song } from '../../models/song';
+
 
 @Component({
     selector: 'song-list',
-    templateUrl: 'song-list.component.html'
+    providers: [SongService],
+    templateUrl: '/song-list.component.html'
 })
-export class SongListComponent {
+export class SongListComponent implements OnInit {
     
-    songList = [];
+    songList: Song[] = [];
 
-    constructor(private songSrv: SongService) {
-    }
+    constructor(private songService: SongService) {}
 
     ngOnInit() {
-
+        this.songService.getSongs()
+            .subscribe( songs => {
+                for(let song of songs ) {
+                    this.songList.push(song);
+                }
+            });
     }
+
 }

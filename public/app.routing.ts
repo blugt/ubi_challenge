@@ -7,20 +7,20 @@ const routes = [
     {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'list'
+        redirectTo: 'song-list'
     },
     {
-        path: 'list',
+        path: 'song-list',
         component: SongListComponent
     },
     {
-        path: 'details',
+        path: 'song-details/:id',
         component: SongDetailsComponent
     }
 ];
 
 @NgModule({
-    imports: [RouterModule.forRoot(routes)],
+    imports: [RouterModule.forRoot(routes, { useHash: true })],
     exports: [RouterModule]
 })
 export class AppRoutingModule {}
