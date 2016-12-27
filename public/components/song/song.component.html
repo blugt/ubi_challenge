@@ -1,18 +1,26 @@
-<div class="row">  
-    <div class="col-lg-12 col-sm-5 col-xs-5 song__icon_container">
-        <i [routerLink]="['/song-details', song.id]" (click)="storeSongDetails()" class="glyphicon glyphicon-cd song__icon"></i>
-    </div>
-    <div class="col-lg-12 col-sm-7 col-xs-7">
-        <div class="row">
-            <div class="col-lg-12">
-                <h4>{{song.track}}</h4>
-                <h5>{{song.artist}}</h5>
+
+<div class="song" [routerLink]="['/song-details', song.id]" (click)="storeSongDetails()" >
+    <div class="row">
+        <div class="col-lg-12 col-sm-4 col-xs-4">
+            <div class="song__icon_container">
+                <i class="fa fa-music song__icon"></i>
             </div>
-            <footer class="col-lg-12">
-                <button *ngIf="userLogged" (click)="setFavorite()" class="song__favorite">
-                    <span [ngClass]="{'glyphicon-star-empty': !song.isFavorite, 'glyphicon-star': song.isFavorite }" class="glyphicon"></span>
-                </button>
-            </footer>
+        </div>
+        <div class="col-lg-12 col-sm-8 col-xs-8 song__info_container">
+            <div class="row">
+                <div class="col-lg-8 col-md-12 col-sm-8 col-xs-8">
+                    <div class="song__titles">
+                        <h4>{{song.track}}</h4>
+                        <h5 class="titles__subtitle">{{song.artist}}</h5>
+                    </div>
+                </div>
+                <footer class="col-lg-4 col-md-12 col-sm-4 col-xs-4">
+                    <button *ngIf="userLogged" (click)="setFavorite($event)" class="song__favorite">
+                        <span [ngClass]="{'favorite--active': song.isFavorite }" class="fa fa-star"></span>
+                    </button>
+                </footer>
+            </div>
         </div>
     </div>
 </div>
+

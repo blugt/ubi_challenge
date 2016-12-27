@@ -40,7 +40,8 @@ export class SongComponent {
             });
     }
 
-    setFavorite() {
+    setFavorite(event) {
+        event.stopPropagation();
         if(this.song.isFavorite) {
             this.removeFavorite();
         } else {

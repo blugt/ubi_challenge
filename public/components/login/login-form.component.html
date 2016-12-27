@@ -1,7 +1,6 @@
-<section class="navbar-right">
-    <form class="navbar-form login-form">
-        <label for="email">Email</label>
-        <input name="email" type="email" [(ngModel)]="user.email">
+<section class="text-right">
+    <form class="login-form">
+        <input placeholder="email" name="email" type="email" [(ngModel)]="user.email">
         <button (click)="userLogin()" *ngIf="!isLogged" class="btn btn-primary">LOGIN</button>
         <button (click)="userLogout()" *ngIf="isLogged" class="btn btn-danger">LOGOUT</button>
     </form>

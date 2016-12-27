@@ -1,13 +1,17 @@
 @import '../../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/variables';
 
-@media(max-width: $screen-tablet) {
+@media(min-width: $screen-phone) {
+  @include grid-xsmall;
+}
+
+@media(min-width: $screen-tablet) {
   @include grid-small;
 }
 
-@media(max-width: $screen-desktop) {
-  
+@media(min-width: $screen-desktop) {
+  @include grid-medium;
 }
 
-@media(max-width: $screen-lg-desktop) {
-
+@media(min-width: $screen-lg-desktop) {
+  @include grid-large;
 }

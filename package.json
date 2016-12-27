@@ -10,6 +10,9 @@
     "type": "git",
     "url": "git+https://github.com/blugt/ubi_challenge.git"
   },
+  "engines":{
+
+  },
   "keywords": [
     "angular",
     "node"
@@ -30,6 +33,7 @@
     "bootstrap-sass": "^3.3.7",
     "cors": "^2.7.1",
     "express": "^4.13.4",
+    "font-awesome": "^4.7.0",
     "fs": "0.0.2",
     "jquery": "^3.1.1",
     "lodash": "^4.6.1",

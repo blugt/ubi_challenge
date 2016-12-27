@@ -44,10 +44,22 @@ var data = {
 		"track" : "Miracle Mile"
 	},
 	{
-		"id": 7,
+		"id": 6,
 		"album" : "Pompeii",
 		"artist" : "Bastille",
 		"track" : "Pompeii"
+	},
+	{
+		"id": 7,
+		"album" : "Monody (feat. Laura Brehm)",
+		"artist" : "TheFatRat",
+		"track" : "Monody (feat. Laura Brehm)"
+	},
+	{
+		"id": 8,
+		"album" : "Transformers OST",
+		"artist" : "Steve Jablonsky",
+		"track" : "Arrival to Earth"
 	}
 	],
 	favorites: [{
