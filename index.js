@@ -19,6 +19,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.use("/dist", express.static(__dirname + '/dist'));
+
 var port = process.env.PORT || 8080;        // set our port
 
 // ROUTES FOR OUR API
@@ -108,7 +109,6 @@ router.delete('/users/:id', function(req, res) {
  */
 
 router.get('/songs', function(req, res) {
-    console.log('song list was requested'); 
     res.statusCode = 200;
 	res.send(songs);
 });

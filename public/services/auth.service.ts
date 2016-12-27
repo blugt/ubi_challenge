@@ -15,11 +15,21 @@ export class AuthService {
             .map(response => response.json())
             .subscribe((json) => {
                 this.authenticated.next(true);
+                localStorage.setItem('currentUserID', json.body.id);
             });
         
     }
 
     logout() {
+        localStorage.removeItem('currentUserID');
         this.authenticated.next(false);
+    }
+
+    isAuthenticated(): boolean {
+        return this.authenticated.value;
+    }
+
+    getCurrentUserID(): String {
+        return localStorage.getItem('currentUserID');
     }
 }

@@ -27,11 +27,25 @@ export class SongComponent {
     }
 
     addFavorite() {
-        this.songService.addFavorite(parseInt(localStorage.getItem('currentUserID')), this.song.id);
+        this.songService.addFavorite(localStorage.getItem('currentUserID'), this.song.id)
+            .subscribe((response: boolean) => {
+                this.song.isFavorite = response;
+            });
     }
 
     removeFavorite() {
-        this.songService.removeFavorite(parseInt(localStorage.getItem('currentUserID')), this.song.id);
+        this.songService.removeFavorite(localStorage.getItem('currentUserID'), this.song.id)
+            .subscribe((response: boolean) => {
+                this.song.isFavorite = !response;
+            });
+    }
+
+    setFavorite() {
+        if(this.song.isFavorite) {
+            this.removeFavorite();
+        } else {
+            this.addFavorite();
+        }
     }
 
 }

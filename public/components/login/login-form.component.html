@@ -1,8 +1,8 @@
-<section>
-    <form >
+<section class="navbar-right">
+    <form class="navbar-form">
         <label for="email">Email</label>
         <input name="email" type="email" [(ngModel)]="user.email">
-        <button (click)="userLogin()">LOGIN</button>
-        <button (click)="userLogout()" *ngIf="isLogged">LOGOUT</button>
+        <button (click)="userLogin()" *ngIf="!isLogged" class="btn btn-primary">LOGIN</button>
+        <button (click)="userLogout()" *ngIf="isLogged" class="btn btn-danger">LOGOUT</button>
     </form>
 </section>

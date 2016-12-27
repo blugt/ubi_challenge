@@ -8,7 +8,7 @@ import { AuthService } from '../../services/auth.service';
 })
 export class LoginFormComponent implements OnInit{
 
-    user: User = new User(null,'','');
+    user: User = new User('','','');
     isLogged: boolean;
 
     constructor(private authService: AuthService) {}

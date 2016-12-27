@@ -24,7 +24,32 @@ var data = {
 		"album" : "slipknot",
 		"artist" : "slipknot",
 		"track" : "slipknot"
-	}],
+	},
+	{
+		"id": 3,
+		"album" : "In your honor",
+		"artist" : "Foo Fighters",
+		"track" : "Still"
+	},
+	{
+		"id": 4,
+		"album" : "Just hold on",
+		"artist" : "Aoki",
+		"track" : "Just hold on"
+	},
+	{
+		"id": 5,
+		"album" : "Dear Miss Lonelyhearts",
+		"artist" : "Cold War Kids",
+		"track" : "Miracle Mile"
+	},
+	{
+		"id": 7,
+		"album" : "Pompeii",
+		"artist" : "Bastille",
+		"track" : "Pompeii"
+	}
+	],
 	favorites: [{
 		userid: 1,
 		musicid: 1

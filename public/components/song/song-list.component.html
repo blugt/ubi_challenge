@@ -1,4 +1,4 @@
-<section>
-    <h5>Songs List</h5>
-    <song-item *ngFor="let songItem of songList" [song]="songItem"></song-item>
+<section class="row">
+    <h1 class="col-md-12">Songs List</h1>
+    <song-item class="col-lg-3 col-md-5 col-sm-12 song" *ngFor="let songItem of songList" [song]="songItem"></song-item>
 </section>

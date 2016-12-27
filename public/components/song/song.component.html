@@ -1,6 +1,18 @@
-<article>
-    <span>{{song.track}}</span>
-    <span>{{song.artist}}</span>
-    <button *ngIf="userLogged" (click)="addFavorite()">Fav</button>
-    <button [routerLink]="['/song-details', song.id]" (click)="storeSongDetails()">More</button>
-</article>
+<div class="row">  
+    <div class="col-lg-12 col-sm-5 col-xs-5 song__icon_container">
+        <i [routerLink]="['/song-details', song.id]" (click)="storeSongDetails()" class="glyphicon glyphicon-cd song__icon"></i>
+    </div>
+    <div class="col-lg-12 col-sm-7 col-xs-7">
+        <div class="row">
+            <div class="col-lg-12">
+                <h4>{{song.track}}</h4>
+                <h5>{{song.artist}}</h5>
+            </div>
+            <footer class="col-lg-12">
+                <button *ngIf="userLogged" (click)="setFavorite()" class="song__favorite">
+                    <span [ngClass]="{'glyphicon-star-empty': !song.isFavorite, 'glyphicon-star': song.isFavorite }" class="glyphicon"></span>
+                </button>
+            </footer>
+        </div>
+    </div>
+</div>
