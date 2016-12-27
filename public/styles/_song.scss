@@ -2,9 +2,9 @@
 
     border: 1px solid #ddd;
     margin-bottom: 12px;
-    
+
     &__icon_container {
-        background-color: #222;
+        background-color: #ccc;
         text-align: center;
     }
 
@@ -12,6 +12,7 @@
         font-size: 250px;
         transition: font-size 0.3s;
         color: rgba(255,255,255,0.4);
+        cursor: pointer;
     }
 
     &__title {
@@ -26,6 +27,31 @@
         border: 0;
         background-color: transparent;
     }
+}
+
+.song-details {
+
+    &__icon_container {
+        text-align: center;
+    }
+
+    &__icon {
+        background-color: #ccc;
+        font-size: 250px;
+        transition: font-size 0.3s;
+        color: rgba(255,255,255,0.4);
+        cursor: pointer;
+    }
+
+    &__button {
+        border: 0;
+        background-color: transparent;
+    }
+}
+
+.glyphicon-cd::before {
+    margin-left: -10px;
+    margin-right: 6px;
 }
 
 @mixin grid-small {

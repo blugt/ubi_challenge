@@ -11,9 +11,7 @@ export class SongDetailsComponent implements OnInit {
 
     song: Song;
 
-    constructor(private route: ActivatedRoute, private dataService: DataService) {
-
-    }
+    constructor(private route: ActivatedRoute, private dataService: DataService) {}
 
     ngOnInit() {
         let id = this.route.snapshot.params['id'];

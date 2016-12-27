@@ -1,5 +1,5 @@
 <section class="navbar-right">
-    <form class="navbar-form">
+    <form class="navbar-form login-form">
         <label for="email">Email</label>
         <input name="email" type="email" [(ngModel)]="user.email">
         <button (click)="userLogin()" *ngIf="!isLogged" class="btn btn-primary">LOGIN</button>
