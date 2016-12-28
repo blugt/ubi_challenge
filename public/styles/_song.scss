@@ -45,31 +45,11 @@
     }
 
     .favorite--active {
-        color: #F4B350;
+        color: $brand-primary;
     }
 
     footer {
         text-align: right;
-    }
-}
-
-.song-details {
-
-    &__icon_container {
-        text-align: center;
-    }
-
-    &__icon {
-        background-color: #ccc;
-        font-size: 250px;
-        color: rgba(255,255,255,0.4);
-        cursor: pointer;
-        padding: 30px;
-    }
-
-    &__button {
-        border: 0;
-        background-color: transparent;
     }
 }
 

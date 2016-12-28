@@ -20,7 +20,8 @@ export class LoginFormComponent implements OnInit{
     }
 
     userLogin() {
-        this.authService.login(this.user.email);
+        if(this.user.username && this.user.email)
+            this.authService.login(this.user.username, this.user.email);
     }
 
     userLogout() {

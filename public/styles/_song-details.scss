@@ -1,0 +1,84 @@
+@import '../../node_modules/bootstrap-sass/assets/stylesheets/bootstrap/variables';
+
+.song-details {
+
+    &__icon {
+        background-color: #ccc;
+        text-align: center;
+        height: 150px;
+        width: 150px;
+        font-size: 130px;
+        color: rgba(255,255,255,0.4);
+        cursor: default;
+        padding: 10px;
+    }
+
+    &__header-text {
+        font-weight: 700;
+        font-size: 32px;
+        line-height: 2em;
+    }
+
+    &__sub-header-text {
+        font-size: 18px;
+        line-height: 2em;
+    }
+
+    &__secondary-text {
+        color: #555;
+        font-size: 20px;
+        line-height: 2em;
+    }
+
+    &__button {
+        border: 0;
+        background-color: transparent;
+    }
+
+    &--aligner {
+        text-align: center;
+    }
+
+    &__small-icon {
+        margin-right: 10px;
+        font-size: 18px;
+        color: $brand-primary;
+    }
+}
+
+@mixin media-sm-details {
+    .song-details {
+
+        &__icon {
+            height: 200px;
+            width: 200px;
+            font-size: 180px;
+        }
+    }
+}
+
+@mixin media-md-details {
+    .song-details {
+
+        &--aligner {
+            text-align: left;
+        }
+    }
+}
+
+@mixin media-lg-details {
+    .song-details {
+
+        &__icon {
+            height: 300px;
+            width: 300px;
+            font-size: 240px;
+            padding: 30px;
+        }
+
+        &--aligner {
+            text-align: left;
+        }
+
+    }
+}

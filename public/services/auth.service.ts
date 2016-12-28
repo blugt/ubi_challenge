@@ -10,14 +10,13 @@ export class AuthService {
 
     constructor(private http: Http) {}
 
-    login(email: String) {
-        this.http.post('/api/users',{email: email, username: email})
+    login(username: String, email: String) {
+        this.http.post('/api/users',{email: email, username: username})
             .map(response => response.json())
             .subscribe((json) => {
                 this.authenticated.next(true);
                 localStorage.setItem('currentUserID', json.body.id);
             });
-        
     }
 
     logout() {

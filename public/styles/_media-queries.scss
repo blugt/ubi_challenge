@@ -6,12 +6,15 @@
 
 @media(min-width: $screen-tablet) {
   @include grid-small;
+  @include media-sm-details;
 }
 
 @media(min-width: $screen-desktop) {
   @include grid-medium;
+  @include media-md-details;
 }
 
 @media(min-width: $screen-lg-desktop) {
   @include grid-large;
+  @include media-lg-details;
 }

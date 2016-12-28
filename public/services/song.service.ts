@@ -14,6 +14,17 @@ export class SongService {
             });
     }
 
+    getSong(id: String) {
+        return this.http.get(`/api/songs/${id}`)
+            .map( response => {
+                if(response.status === 200) {
+                    return response.json();
+                } else{
+                    return null;
+                }
+            });
+    }
+
     getFavorites(userID: String) {
         return this.http.get(`/api/users/${userID}/songs`)
             .map((response) => {
