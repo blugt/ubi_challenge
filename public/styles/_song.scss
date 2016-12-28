@@ -13,11 +13,11 @@
     }
 
     &__info_container {
-            margin-top: 15px;
+        margin-top: 15px;
+        padding-left: 0;
     }
 
     &__titles {
-        padding-left: 15px;
         font-size: 16px;
 
         p {
@@ -39,9 +39,7 @@
         border: 0;
         background-color: transparent;
         font-size: 2.5em;
-        line-height: 2.5em;
         color: #444;
-        margin-right: 9px;
     }
 
     .favorite--active {
@@ -109,6 +107,7 @@
 
         &__info_container {
             margin-top: 10px;
+            padding-left: 15px;
         }
 
         &__titles {
@@ -130,9 +129,7 @@
             margin-top: 10px;
         }
 
-        &__titles {
-            padding-left: 15px;
-            
+        &__titles {           
             h4 {
                 font-size: 18px;
             }
