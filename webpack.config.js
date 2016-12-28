@@ -40,7 +40,7 @@ module.exports = {
             }, {
               test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
               loader: "file-loader?name=./fonts/[name].[ext]"
-            } 
+            }
         ]
     },
     resolve: {

@@ -19,7 +19,8 @@ var data = {
 		"artist" : "Nirvana",
 		"track" : "Come as You Are",
 		"year" : 1992,
-		"length" : "3:38" 
+		"length" : "3:38",
+		"thumb": "nevermind.jpg" 
 	},
 	{
 		"id": 2,
@@ -27,7 +28,8 @@ var data = {
 		"artist" : "Slipknot",
 		"track" : "Sulfur",
 		"year" : 2009,
-		"length" : "4:37" 
+		"length" : "4:37",
+		"thumb": "all_hope_is_gone.jpg" 
 	},
 	{
 		"id": 3,
@@ -35,7 +37,8 @@ var data = {
 		"artist" : "Foo Fighters",
 		"track" : "Still",
 		"year" : 2005,
-		"length" : "5:15" 
+		"length" : "5:15",
+		"thumb": "in_your_honor.jpg"  
 	},
 	{
 		"id": 4,
@@ -43,7 +46,8 @@ var data = {
 		"artist" : "Aoki",
 		"track" : "Just hold on",
 		"year" : 2016,
-		"length" : "3:18" 
+		"length" : "3:18",
+		"thumb": "just_hold_on.jpg"  
 	},
 	{
 		"id": 5,
@@ -51,7 +55,8 @@ var data = {
 		"artist" : "Cold War Kids",
 		"track" : "Miracle Mile",
 		"year" : 2013,
-		"length" : "3:00" 
+		"length" : "3:00",
+		"thumb": "dear_miss_lonelyhearts.jpg"  
 	},
 	{
 		"id": 6,
@@ -59,7 +64,8 @@ var data = {
 		"artist" : "Bastille",
 		"track" : "Pompeii",
 		"year" : 2013,
-		"length" : "3:34" 
+		"length" : "3:34",
+		"thumb": "pompeii.jpg"  
 	},
 	{
 		"id": 7,
@@ -67,7 +73,8 @@ var data = {
 		"artist" : "TheFatRat",
 		"track" : "Monody (feat. Laura Brehm)",
 		"year" : 2015,
-		"length" : "4:51" 
+		"length" : "4:51",
+		"thumb": "monody.jpg"  
 	},
 	{
 		"id": 8,
@@ -75,7 +82,8 @@ var data = {
 		"artist" : "Steve Jablonsky",
 		"track" : "Arrival to Earth",
 		"year" : 2007,
-		"length" : "5:28" 
+		"length" : "5:28",
+		"thumb": "arrival_to_earth.jpg" 
 	}
 	],
 	favorites: [{

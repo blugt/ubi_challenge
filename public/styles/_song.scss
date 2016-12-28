@@ -6,20 +6,10 @@
     background-color: #2A2A2A;
     cursor: pointer;
 
-    &__icon_container {
-        text-align: center;
-    }
-
-    &__icon {
-        font-size: 40px;
-        transition: font-size 0.15s;
-        color: rgba(255,255,255,0.4);
-        padding-top: 20px;
-        padding-left: 10px;
-    }
-
-    &__info_container {
-        margin-top: 10px;
+    &__thumb {
+        width: 100%;
+        height: auto;
+        min-height: 70px;
     }
 
     &__titles {
@@ -39,7 +29,8 @@
     &__favorite {
         border: 0;
         background-color: transparent;
-        font-size: 3.5em;
+        font-size: 2.5em;
+        line-height: 2.5em;
         color: #444;
         margin-right: 9px;
     }
@@ -62,9 +53,6 @@
             padding-top: 15px;
         }
 
-        &__info_container {
-            margin-top: 10px;
-        }
     }
 }
 
@@ -126,13 +114,6 @@
     .song {
         margin-bottom: 30px;
 
-        &__icon {
-            font-size: 250px;
-            padding-bottom: 0;
-            padding-top: 0;
-            padding-left: 0;
-        }
-
         &__info_container {
             margin-top: 5px;
         }
@@ -148,7 +129,7 @@
         &__favorite {
             border: 0;
             background-color: transparent;
-            font-size: 3em;
+            font-size: 2.5em;
         }
 
         footer {

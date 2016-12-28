@@ -2,83 +2,42 @@
 
 .song-details {
 
-    &__icon {
-        background-color: #ccc;
-        text-align: center;
-        height: 150px;
+    &__thumb {
         width: 150px;
-        font-size: 130px;
-        color: rgba(255,255,255,0.4);
-        cursor: default;
-        padding: 10px;
+        height: auto;
+    }
+
+    &__info_container {
+        margin-top: 15px;
     }
 
     &__header-text {
         font-weight: 700;
-        font-size: 32px;
-        line-height: 2em;
+        font-size: 48px;
     }
 
     &__sub-header-text {
-        font-size: 18px;
-        line-height: 2em;
+        font-size: 16px;
     }
 
     &__secondary-text {
         color: #555;
-        font-size: 20px;
-        line-height: 2em;
+        font-size: 16px;
     }
 
     &__button {
         border: 0;
         background-color: transparent;
+        margin-bottom: 15px;
     }
 
-    &--aligner {
-        text-align: center;
-    }
-
-    &__small-icon {
-        margin-right: 10px;
-        font-size: 18px;
-        color: $brand-primary;
-    }
 }
 
-@mixin media-sm-details {
+@mixin media-lg-song-details {
     .song-details {
 
-        &__icon {
-            height: 200px;
-            width: 200px;
-            font-size: 180px;
-        }
-    }
-}
-
-@mixin media-md-details {
-    .song-details {
-
-        &--aligner {
-            text-align: left;
-        }
-    }
-}
-
-@mixin media-lg-details {
-    .song-details {
-
-        &__icon {
-            height: 300px;
+        &__thumb {
             width: 300px;
-            font-size: 240px;
-            padding: 30px;
         }
-
-        &--aligner {
-            text-align: left;
-        }
-
     }
 }

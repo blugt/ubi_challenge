@@ -7,17 +7,15 @@
 
 @media(min-width: $screen-tablet) {
   @include grid-small;
-  @include media-sm-details;
   @include media-sm-login-form;
 }
 
 @media(min-width: $screen-desktop) {
   @include grid-medium;
-  @include media-md-details;
   @include media-md-login-form;
 }
 
 @media(min-width: $screen-lg-desktop) {
   @include grid-large;
-  @include media-lg-details;
+  @include media-lg-song-details;
 }

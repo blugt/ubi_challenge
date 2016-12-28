@@ -19,6 +19,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.use("/dist", express.static(__dirname + '/dist'));
+app.use("/resources", express.static(__dirname + '/resources'));
 
 var port = process.env.PORT || 8080;        // set our port
 
