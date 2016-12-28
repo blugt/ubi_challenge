@@ -1,6 +1,7 @@
 import { Http } from '@angular/http';
 import { Injectable } from '@angular/core';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/catch';
 
 @Injectable()
 export class SongService {
@@ -33,17 +34,25 @@ export class SongService {
     }
 
     addFavorite(userID: String, songID: Number) {
-        return this.http.post(`/api/users/${userID}/songs`,{
+        let resp = this.http.post(`/api/users/${userID}/songs`,{
             musicid: songID
         }).map( response => {
             return response.status === 200;
-        });
+        }).share();
+
+        resp.subscribe(response => {
+
+        }, err => {
+            console.log(err);
+        }, ()=>{});
+
+        return resp;
     }
 
     removeFavorite(userID: String, songID: Number) {
         return this.http.delete(`/api/users/${userID}/songs/${songID}`,{})
         .map( response => {
-            return response.status === 200
+            return response.status === 200;
         });
     }
 

@@ -19,17 +19,28 @@ export class SongComponent {
     ngOnInit() {
         this.authService.authenticated.subscribe((value: boolean) => {
             this.userLogged = value;
+            if(!value) {
+                this.song.isFavorite = false;
+            } else {
+                let found = this.dataService.getFavorites().find( favorite => {
+                    return favorite === this.song.id;
+                });
+                if(found){
+                    this.song.isFavorite = true;
+                }
+            }
         });
     }
 
     storeSongDetails() {
-         this.dataService.storeNew(this.song);
+         this.dataService.storeNewSong(this.song);
     }
 
     addFavorite() {
         this.songService.addFavorite(localStorage.getItem('currentUserID'), this.song.id)
             .subscribe((response: boolean) => {
                 this.song.isFavorite = response;
+                this.dataService.storeFavorite(this.song.id);
             });
     }
 
@@ -37,6 +48,7 @@ export class SongComponent {
         this.songService.removeFavorite(localStorage.getItem('currentUserID'), this.song.id)
             .subscribe((response: boolean) => {
                 this.song.isFavorite = !response;
+                this.dataService.removeFavorite(this.song.id);
             });
     }
 

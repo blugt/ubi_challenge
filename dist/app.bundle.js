@@ -54025,8 +54025,8 @@
 	var forms_1 = __webpack_require__(38);
 	var App_component_1 = __webpack_require__(42);
 	var song_component_1 = __webpack_require__(44);
-	var login_form_component_1 = __webpack_require__(54);
-	var app_routing_1 = __webpack_require__(57);
+	var login_form_component_1 = __webpack_require__(58);
+	var app_routing_1 = __webpack_require__(61);
 	var common_1 = __webpack_require__(36);
 	var http_1 = __webpack_require__(47);
 	var data_service_1 = __webpack_require__(50);
@@ -60068,16 +60068,28 @@
 	        var _this = this;
 	        this.authService.authenticated.subscribe(function (value) {
 	            _this.userLogged = value;
+	            if (!value) {
+	                _this.song.isFavorite = false;
+	            }
+	            else {
+	                var found = _this.dataService.getFavorites().find(function (favorite) {
+	                    return favorite === _this.song.id;
+	                });
+	                if (found) {
+	                    _this.song.isFavorite = true;
+	                }
+	            }
 	        });
 	    };
 	    SongComponent.prototype.storeSongDetails = function () {
-	        this.dataService.storeNew(this.song);
+	        this.dataService.storeNewSong(this.song);
 	    };
 	    SongComponent.prototype.addFavorite = function () {
 	        var _this = this;
 	        this.songService.addFavorite(localStorage.getItem('currentUserID'), this.song.id)
 	            .subscribe(function (response) {
 	            _this.song.isFavorite = response;
+	            _this.dataService.storeFavorite(_this.song.id);
 	        });
 	    };
 	    SongComponent.prototype.removeFavorite = function () {
@@ -60085,6 +60097,7 @@
 	        this.songService.removeFavorite(localStorage.getItem('currentUserID'), this.song.id)
 	            .subscribe(function (response) {
 	            _this.song.isFavorite = !response;
+	            _this.dataService.removeFavorite(_this.song.id);
 	        });
 	    };
 	    SongComponent.prototype.setFavorite = function (event) {
@@ -60104,7 +60117,7 @@
 	        core_1.Component({
 	            selector: 'song-item',
 	            providers: [song_service_1.SongService],
-	            template: __webpack_require__(53)
+	            template: __webpack_require__(57)
 	        }), 
 	        __metadata('design:paramtypes', [song_service_1.SongService, auth_service_1.AuthService, data_service_1.DataService])
 	    ], SongComponent);
@@ -60150,6 +60163,7 @@
 	var http_1 = __webpack_require__(47);
 	var core_1 = __webpack_require__(17);
 	__webpack_require__(48);
+	__webpack_require__(94);
 	var SongService = (function () {
 	    function SongService(http) {
 	        this.http = http;
@@ -60178,11 +60192,16 @@
 	        });
 	    };
 	    SongService.prototype.addFavorite = function (userID, songID) {
-	        return this.http.post("/api/users/" + userID + "/songs", {
+	        var resp = this.http.post("/api/users/" + userID + "/songs", {
 	            musicid: songID
 	        }).map(function (response) {
 	            return response.status === 200;
-	        });
+	        }).share();
+	        resp.subscribe(function (response) {
+	        }, function (err) {
+	            console.log(err);
+	        }, function () { });
+	        return resp;
 	    };
 	    SongService.prototype.removeFavorite = function (userID, songID) {
 	        return this.http.delete("/api/users/" + userID + "/songs/" + songID, {})
@@ -62351,12 +62370,30 @@
 	var core_1 = __webpack_require__(17);
 	var DataService = (function () {
 	    function DataService() {
+	        this.currentFavorites = [];
 	    }
-	    DataService.prototype.getCurrentStored = function (songID) {
-	        return this.song;
+	    DataService.prototype.getCurrentStoredSong = function (songID) {
+	        return this.currentSong;
 	    };
-	    DataService.prototype.storeNew = function (song) {
-	        this.song = song;
+	    DataService.prototype.storeNewSong = function (song) {
+	        this.currentSong = song;
+	    };
+	    DataService.prototype.storeFavorite = function (favs) {
+	        this.currentFavorites.push(favs);
+	    };
+	    DataService.prototype.removeFavorite = function (id) {
+	        var found = this.currentFavorites.findIndex(function (f) {
+	            return f === id;
+	        });
+	        if (found > -1) {
+	            this.currentFavorites.splice(found, 1);
+	        }
+	    };
+	    DataService.prototype.clearFavorites = function () {
+	        this.currentFavorites = [];
+	    };
+	    DataService.prototype.getFavorites = function () {
+	        return this.currentFavorites;
 	    };
 	    DataService = __decorate([
 	        core_1.Injectable(), 
@@ -62385,6 +62422,7 @@
 	var http_1 = __webpack_require__(47);
 	var BehaviorSubject_1 = __webpack_require__(52);
 	__webpack_require__(48);
+	__webpack_require__(53);
 	var AuthService = (function () {
 	    function AuthService(http) {
 	        this.http = http;
@@ -62392,12 +62430,13 @@
 	    }
 	    AuthService.prototype.login = function (username, email) {
 	        var _this = this;
-	        this.http.post('/api/users', { email: email, username: username })
-	            .map(function (response) { return response.json(); })
-	            .subscribe(function (json) {
-	            _this.authenticated.next(true);
+	        var sharable = this.http.post('/api/users', { email: email, username: username })
+	            .map(function (response) { return response.json(); }).share();
+	        sharable.subscribe(function (json) {
 	            localStorage.setItem('currentUserID', json.body.id);
+	            _this.authenticated.next(true);
 	        });
+	        return sharable;
 	    };
 	    AuthService.prototype.logout = function () {
 	        localStorage.removeItem('currentUserID');
@@ -62474,12 +62513,280 @@
 
 /***/ },
 /* 53 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var Observable_1 = __webpack_require__(19);
+	var share_1 = __webpack_require__(54);
+	Observable_1.Observable.prototype.share = share_1.share;
+	//# sourceMappingURL=share.js.map
+
+/***/ },
+/* 54 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var multicast_1 = __webpack_require__(55);
+	var Subject_1 = __webpack_require__(18);
+	function shareSubjectFactory() {
+	    return new Subject_1.Subject();
+	}
+	/**
+	 * Returns a new Observable that multicasts (shares) the original Observable. As long as there is at least one
+	 * Subscriber this Observable will be subscribed and emitting data. When all subscribers have unsubscribed it will
+	 * unsubscribe from the source Observable. Because the Observable is multicasting it makes the stream `hot`.
+	 * This is an alias for .publish().refCount().
+	 *
+	 * <img src="./img/share.png" width="100%">
+	 *
+	 * @return {Observable<T>} an Observable that upon connection causes the source Observable to emit items to its Observers
+	 * @method share
+	 * @owner Observable
+	 */
+	function share() {
+	    return multicast_1.multicast.call(this, shareSubjectFactory).refCount();
+	}
+	exports.share = share;
+	;
+	//# sourceMappingURL=share.js.map
+
+/***/ },
+/* 55 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var ConnectableObservable_1 = __webpack_require__(56);
+	/* tslint:disable:max-line-length */
+	/**
+	 * Returns an Observable that emits the results of invoking a specified selector on items
+	 * emitted by a ConnectableObservable that shares a single subscription to the underlying stream.
+	 *
+	 * <img src="./img/multicast.png" width="100%">
+	 *
+	 * @param {Function|Subject} Factory function to create an intermediate subject through
+	 * which the source sequence's elements will be multicast to the selector function
+	 * or Subject to push source elements into.
+	 * @param {Function} Optional selector function that can use the multicasted source stream
+	 * as many times as needed, without causing multiple subscriptions to the source stream.
+	 * Subscribers to the given source will receive all notifications of the source from the
+	 * time of the subscription forward.
+	 * @return {Observable} an Observable that emits the results of invoking the selector
+	 * on the items emitted by a `ConnectableObservable` that shares a single subscription to
+	 * the underlying stream.
+	 * @method multicast
+	 * @owner Observable
+	 */
+	function multicast(subjectOrSubjectFactory, selector) {
+	    var subjectFactory;
+	    if (typeof subjectOrSubjectFactory === 'function') {
+	        subjectFactory = subjectOrSubjectFactory;
+	    }
+	    else {
+	        subjectFactory = function subjectFactory() {
+	            return subjectOrSubjectFactory;
+	        };
+	    }
+	    if (typeof selector === 'function') {
+	        return this.lift(new MulticastOperator(subjectFactory, selector));
+	    }
+	    var connectable = Object.create(this, ConnectableObservable_1.connectableObservableDescriptor);
+	    connectable.source = this;
+	    connectable.subjectFactory = subjectFactory;
+	    return connectable;
+	}
+	exports.multicast = multicast;
+	var MulticastOperator = (function () {
+	    function MulticastOperator(subjectFactory, selector) {
+	        this.subjectFactory = subjectFactory;
+	        this.selector = selector;
+	    }
+	    MulticastOperator.prototype.call = function (subscriber, source) {
+	        var selector = this.selector;
+	        var subject = this.subjectFactory();
+	        var subscription = selector(subject).subscribe(subscriber);
+	        subscription.add(source.subscribe(subject));
+	        return subscription;
+	    };
+	    return MulticastOperator;
+	}());
+	exports.MulticastOperator = MulticastOperator;
+	//# sourceMappingURL=multicast.js.map
+
+/***/ },
+/* 56 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var __extends = (this && this.__extends) || function (d, b) {
+	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+	    function __() { this.constructor = d; }
+	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	};
+	var Subject_1 = __webpack_require__(18);
+	var Observable_1 = __webpack_require__(19);
+	var Subscriber_1 = __webpack_require__(22);
+	var Subscription_1 = __webpack_require__(24);
+	/**
+	 * @class ConnectableObservable<T>
+	 */
+	var ConnectableObservable = (function (_super) {
+	    __extends(ConnectableObservable, _super);
+	    function ConnectableObservable(source, subjectFactory) {
+	        _super.call(this);
+	        this.source = source;
+	        this.subjectFactory = subjectFactory;
+	        this._refCount = 0;
+	    }
+	    ConnectableObservable.prototype._subscribe = function (subscriber) {
+	        return this.getSubject().subscribe(subscriber);
+	    };
+	    ConnectableObservable.prototype.getSubject = function () {
+	        var subject = this._subject;
+	        if (!subject || subject.isStopped) {
+	            this._subject = this.subjectFactory();
+	        }
+	        return this._subject;
+	    };
+	    ConnectableObservable.prototype.connect = function () {
+	        var connection = this._connection;
+	        if (!connection) {
+	            connection = this._connection = new Subscription_1.Subscription();
+	            connection.add(this.source
+	                .subscribe(new ConnectableSubscriber(this.getSubject(), this)));
+	            if (connection.closed) {
+	                this._connection = null;
+	                connection = Subscription_1.Subscription.EMPTY;
+	            }
+	            else {
+	                this._connection = connection;
+	            }
+	        }
+	        return connection;
+	    };
+	    ConnectableObservable.prototype.refCount = function () {
+	        return this.lift(new RefCountOperator(this));
+	    };
+	    return ConnectableObservable;
+	}(Observable_1.Observable));
+	exports.ConnectableObservable = ConnectableObservable;
+	exports.connectableObservableDescriptor = {
+	    operator: { value: null },
+	    _refCount: { value: 0, writable: true },
+	    _subscribe: { value: ConnectableObservable.prototype._subscribe },
+	    getSubject: { value: ConnectableObservable.prototype.getSubject },
+	    connect: { value: ConnectableObservable.prototype.connect },
+	    refCount: { value: ConnectableObservable.prototype.refCount }
+	};
+	var ConnectableSubscriber = (function (_super) {
+	    __extends(ConnectableSubscriber, _super);
+	    function ConnectableSubscriber(destination, connectable) {
+	        _super.call(this, destination);
+	        this.connectable = connectable;
+	    }
+	    ConnectableSubscriber.prototype._error = function (err) {
+	        this._unsubscribe();
+	        _super.prototype._error.call(this, err);
+	    };
+	    ConnectableSubscriber.prototype._complete = function () {
+	        this._unsubscribe();
+	        _super.prototype._complete.call(this);
+	    };
+	    ConnectableSubscriber.prototype._unsubscribe = function () {
+	        var connectable = this.connectable;
+	        if (connectable) {
+	            this.connectable = null;
+	            var connection = connectable._connection;
+	            connectable._refCount = 0;
+	            connectable._subject = null;
+	            connectable._connection = null;
+	            if (connection) {
+	                connection.unsubscribe();
+	            }
+	        }
+	    };
+	    return ConnectableSubscriber;
+	}(Subject_1.SubjectSubscriber));
+	var RefCountOperator = (function () {
+	    function RefCountOperator(connectable) {
+	        this.connectable = connectable;
+	    }
+	    RefCountOperator.prototype.call = function (subscriber, source) {
+	        var connectable = this.connectable;
+	        connectable._refCount++;
+	        var refCounter = new RefCountSubscriber(subscriber, connectable);
+	        var subscription = source.subscribe(refCounter);
+	        if (!refCounter.closed) {
+	            refCounter.connection = connectable.connect();
+	        }
+	        return subscription;
+	    };
+	    return RefCountOperator;
+	}());
+	var RefCountSubscriber = (function (_super) {
+	    __extends(RefCountSubscriber, _super);
+	    function RefCountSubscriber(destination, connectable) {
+	        _super.call(this, destination);
+	        this.connectable = connectable;
+	    }
+	    RefCountSubscriber.prototype._unsubscribe = function () {
+	        var connectable = this.connectable;
+	        if (!connectable) {
+	            this.connection = null;
+	            return;
+	        }
+	        this.connectable = null;
+	        var refCount = connectable._refCount;
+	        if (refCount <= 0) {
+	            this.connection = null;
+	            return;
+	        }
+	        connectable._refCount = refCount - 1;
+	        if (refCount > 1) {
+	            this.connection = null;
+	            return;
+	        }
+	        ///
+	        // Compare the local RefCountSubscriber's connection Subscription to the
+	        // connection Subscription on the shared ConnectableObservable. In cases
+	        // where the ConnectableObservable source synchronously emits values, and
+	        // the RefCountSubscriber's downstream Observers synchronously unsubscribe,
+	        // execution continues to here before the RefCountOperator has a chance to
+	        // supply the RefCountSubscriber with the shared connection Subscription.
+	        // For example:
+	        // ```
+	        // Observable.range(0, 10)
+	        //   .publish()
+	        //   .refCount()
+	        //   .take(5)
+	        //   .subscribe();
+	        // ```
+	        // In order to account for this case, RefCountSubscriber should only dispose
+	        // the ConnectableObservable's shared connection Subscription if the
+	        // connection Subscription exists, *and* either:
+	        //   a. RefCountSubscriber doesn't have a reference to the shared connection
+	        //      Subscription yet, or,
+	        //   b. RefCountSubscriber's connection Subscription reference is identical
+	        //      to the shared connection Subscription
+	        ///
+	        var connection = this.connection;
+	        var sharedConnection = connectable._connection;
+	        this.connection = null;
+	        if (sharedConnection && (!connection || sharedConnection === connection)) {
+	            sharedConnection.unsubscribe();
+	        }
+	    };
+	    return RefCountSubscriber;
+	}(Subscriber_1.Subscriber));
+	//# sourceMappingURL=ConnectableObservable.js.map
+
+/***/ },
+/* 57 */
 /***/ function(module, exports) {
 
 	module.exports = "\r\n<div class=\"song\" [routerLink]=\"['/song-details', song.id]\" (click)=\"storeSongDetails()\" >\r\n    <div class=\"row\">\r\n        <div class=\"col-lg-12 col-sm-4 col-xs-2\">\r\n            <div class=\"song__icon_container\">\r\n                <i class=\"fa fa-music song__icon\"></i>\r\n            </div>\r\n        </div>\r\n        <div class=\"col-lg-12 col-sm-8 col-xs-10 song__info_container\">\r\n            <div class=\"row\">\r\n                <div class=\"col-lg-8 col-md-12 col-sm-8 col-xs-7\">\r\n                    <div class=\"song__titles\">\r\n                        <h4>{{song.track}}</h4>\r\n                        <h5 class=\"titles__subtitle\">{{song.artist}}</h5>\r\n                    </div>\r\n                </div>\r\n                <footer class=\"col-lg-4 col-md-12 col-sm-4 col-xs-5\">\r\n                    <button *ngIf=\"userLogged\" (click)=\"setFavorite($event)\" class=\"song__favorite\">\r\n                        <span [ngClass]=\"{'favorite--active': song.isFavorite }\" class=\"fa fa-star\"></span>\r\n                    </button>\r\n                </footer>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>\r\n\r\n";
 
 /***/ },
-/* 54 */
+/* 58 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -62493,11 +62800,13 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(17);
-	var user_1 = __webpack_require__(55);
+	var user_1 = __webpack_require__(59);
 	var auth_service_1 = __webpack_require__(51);
+	var data_service_1 = __webpack_require__(50);
 	var LoginFormComponent = (function () {
-	    function LoginFormComponent(authService) {
+	    function LoginFormComponent(authService, dataService) {
 	        this.authService = authService;
+	        this.dataService = dataService;
 	        this.user = new user_1.User('', '', '');
 	    }
 	    LoginFormComponent.prototype.ngOnInit = function () {
@@ -62507,8 +62816,18 @@
 	        });
 	    };
 	    LoginFormComponent.prototype.userLogin = function () {
-	        if (this.user.username && this.user.email)
-	            this.authService.login(this.user.username, this.user.email);
+	        var _this = this;
+	        if (this.user.username && this.user.email) {
+	            this.authService.login(this.user.username, this.user.email)
+	                .subscribe(function (response) {
+	                if (response.body.favorites) {
+	                    for (var _i = 0, _a = response.body.favorites; _i < _a.length; _i++) {
+	                        var fav = _a[_i];
+	                        _this.dataService.storeFavorite(fav);
+	                    }
+	                }
+	            });
+	        }
 	    };
 	    LoginFormComponent.prototype.userLogout = function () {
 	        this.authService.logout();
@@ -62516,9 +62835,9 @@
 	    LoginFormComponent = __decorate([
 	        core_1.Component({
 	            selector: 'login-form',
-	            template: __webpack_require__(56)
+	            template: __webpack_require__(60)
 	        }), 
-	        __metadata('design:paramtypes', [auth_service_1.AuthService])
+	        __metadata('design:paramtypes', [auth_service_1.AuthService, data_service_1.DataService])
 	    ], LoginFormComponent);
 	    return LoginFormComponent;
 	}());
@@ -62526,7 +62845,7 @@
 
 
 /***/ },
-/* 55 */
+/* 59 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -62542,13 +62861,13 @@
 
 
 /***/ },
-/* 56 */
+/* 60 */
 /***/ function(module, exports) {
 
 	module.exports = "<section class=\"text-right\">\r\n    <form class=\"login-form\">\r\n        <input *ngIf=\"!isLogged\" placeholder=\"username\" name=\"username\" type=\"text\" [(ngModel)]=\"user.username\">\r\n        <input *ngIf=\"!isLogged\" placeholder=\"email\" name=\"email\" type=\"email\" [(ngModel)]=\"user.email\">\r\n        <button (click)=\"userLogin()\" *ngIf=\"!isLogged\" class=\"btn btn-primary\">LOGIN</button>\r\n        <button (click)=\"userLogout()\" *ngIf=\"isLogged\" class=\"btn btn-danger\">LOGOUT</button>\r\n    </form>\r\n</section>";
 
 /***/ },
-/* 57 */
+/* 61 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -62562,9 +62881,9 @@
 	    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 	};
 	var core_1 = __webpack_require__(17);
-	var router_1 = __webpack_require__(58);
-	var song_list_component_1 = __webpack_require__(86);
-	var song_details_component_1 = __webpack_require__(88);
+	var router_1 = __webpack_require__(62);
+	var song_list_component_1 = __webpack_require__(90);
+	var song_details_component_1 = __webpack_require__(92);
 	var routes = [
 	    {
 	        path: '',
@@ -62597,7 +62916,7 @@
 
 
 /***/ },
-/* 58 */
+/* 62 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/**
@@ -62605,7 +62924,7 @@
 	 * (c) 2010-2016 Google, Inc. https://angular.io/
 	 * License: MIT
 	 */(function (global, factory) {
-	   true ? factory(exports, __webpack_require__(36), __webpack_require__(17), __webpack_require__(52), __webpack_require__(18), __webpack_require__(59), __webpack_require__(71), __webpack_require__(72), __webpack_require__(77), __webpack_require__(78), __webpack_require__(49), __webpack_require__(73), __webpack_require__(80), __webpack_require__(19), __webpack_require__(81), __webpack_require__(82), __webpack_require__(79), __webpack_require__(40), __webpack_require__(84), __webpack_require__(83), __webpack_require__(35), __webpack_require__(85)) :
+	   true ? factory(exports, __webpack_require__(36), __webpack_require__(17), __webpack_require__(52), __webpack_require__(18), __webpack_require__(63), __webpack_require__(75), __webpack_require__(76), __webpack_require__(81), __webpack_require__(82), __webpack_require__(49), __webpack_require__(77), __webpack_require__(84), __webpack_require__(19), __webpack_require__(85), __webpack_require__(86), __webpack_require__(83), __webpack_require__(40), __webpack_require__(88), __webpack_require__(87), __webpack_require__(35), __webpack_require__(89)) :
 	  typeof define === 'function' && define.amd ? define(['exports', '@angular/common', '@angular/core', 'rxjs/BehaviorSubject', 'rxjs/Subject', 'rxjs/observable/from', 'rxjs/observable/of', 'rxjs/operator/concatMap', 'rxjs/operator/every', 'rxjs/operator/first', 'rxjs/operator/map', 'rxjs/operator/mergeMap', 'rxjs/operator/reduce', 'rxjs/Observable', 'rxjs/operator/catch', 'rxjs/operator/concatAll', 'rxjs/util/EmptyError', 'rxjs/observable/fromPromise', 'rxjs/operator/last', 'rxjs/operator/mergeAll', '@angular/platform-browser', 'rxjs/operator/filter'], factory) :
 	  (factory((global.ng = global.ng || {}, global.ng.router = global.ng.router || {}),global.ng.common,global.ng.core,global.Rx,global.Rx,global.Rx.Observable,global.Rx.Observable,global.Rx.Observable.prototype,global.Rx.Observable.prototype,global.Rx.Observable.prototype,global.Rx.Observable.prototype,global.Rx.Observable.prototype,global.Rx.Observable.prototype,global.Rx,global.Rx.Observable.prototype,global.Rx.Observable.prototype,global.Rx,global.Rx.Observable,global.Rx.Observable.prototype,global.Rx.Observable.prototype,global.ng.platformBrowser,global.Rx.Observable.prototype));
 	}(this, function (exports,_angular_common,_angular_core,rxjs_BehaviorSubject,rxjs_Subject,rxjs_observable_from,rxjs_observable_of,rxjs_operator_concatMap,rxjs_operator_every,rxjs_operator_first,rxjs_operator_map,rxjs_operator_mergeMap,rxjs_operator_reduce,rxjs_Observable,rxjs_operator_catch,rxjs_operator_concatAll,rxjs_util_EmptyError,rxjs_observable_fromPromise,l,rxjs_operator_mergeAll,_angular_platformBrowser,rxjs_operator_filter) { 'use strict';
@@ -68065,16 +68384,16 @@
 	}));
 
 /***/ },
-/* 59 */
+/* 63 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var FromObservable_1 = __webpack_require__(60);
+	var FromObservable_1 = __webpack_require__(64);
 	exports.from = FromObservable_1.FromObservable.create;
 	//# sourceMappingURL=from.js.map
 
 /***/ },
-/* 60 */
+/* 64 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -68084,14 +68403,14 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var isArray_1 = __webpack_require__(25);
-	var isPromise_1 = __webpack_require__(61);
+	var isPromise_1 = __webpack_require__(65);
 	var PromiseObservable_1 = __webpack_require__(41);
-	var IteratorObservable_1 = __webpack_require__(62);
-	var ArrayObservable_1 = __webpack_require__(64);
-	var ArrayLikeObservable_1 = __webpack_require__(68);
-	var iterator_1 = __webpack_require__(63);
+	var IteratorObservable_1 = __webpack_require__(66);
+	var ArrayObservable_1 = __webpack_require__(68);
+	var ArrayLikeObservable_1 = __webpack_require__(72);
+	var iterator_1 = __webpack_require__(67);
 	var Observable_1 = __webpack_require__(19);
-	var observeOn_1 = __webpack_require__(69);
+	var observeOn_1 = __webpack_require__(73);
 	var observable_1 = __webpack_require__(32);
 	var isArrayLike = (function (x) { return x && typeof x.length === 'number'; });
 	/**
@@ -68201,7 +68520,7 @@
 	//# sourceMappingURL=FromObservable.js.map
 
 /***/ },
-/* 61 */
+/* 65 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -68212,7 +68531,7 @@
 	//# sourceMappingURL=isPromise.js.map
 
 /***/ },
-/* 62 */
+/* 66 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -68223,7 +68542,7 @@
 	};
 	var root_1 = __webpack_require__(20);
 	var Observable_1 = __webpack_require__(19);
-	var iterator_1 = __webpack_require__(63);
+	var iterator_1 = __webpack_require__(67);
 	/**
 	 * We need this JSDoc comment for affecting ESDoc.
 	 * @extends {Ignored}
@@ -68380,7 +68699,7 @@
 	//# sourceMappingURL=IteratorObservable.js.map
 
 /***/ },
-/* 63 */
+/* 67 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -68419,7 +68738,7 @@
 	//# sourceMappingURL=iterator.js.map
 
 /***/ },
-/* 64 */
+/* 68 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -68429,9 +68748,9 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var Observable_1 = __webpack_require__(19);
-	var ScalarObservable_1 = __webpack_require__(65);
-	var EmptyObservable_1 = __webpack_require__(66);
-	var isScheduler_1 = __webpack_require__(67);
+	var ScalarObservable_1 = __webpack_require__(69);
+	var EmptyObservable_1 = __webpack_require__(70);
+	var isScheduler_1 = __webpack_require__(71);
 	/**
 	 * We need this JSDoc comment for affecting ESDoc.
 	 * @extends {Ignored}
@@ -68546,7 +68865,7 @@
 	//# sourceMappingURL=ArrayObservable.js.map
 
 /***/ },
-/* 65 */
+/* 69 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -68609,7 +68928,7 @@
 	//# sourceMappingURL=ScalarObservable.js.map
 
 /***/ },
-/* 66 */
+/* 70 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -68695,7 +69014,7 @@
 	//# sourceMappingURL=EmptyObservable.js.map
 
 /***/ },
-/* 67 */
+/* 71 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -68706,7 +69025,7 @@
 	//# sourceMappingURL=isScheduler.js.map
 
 /***/ },
-/* 68 */
+/* 72 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -68716,8 +69035,8 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var Observable_1 = __webpack_require__(19);
-	var ScalarObservable_1 = __webpack_require__(65);
-	var EmptyObservable_1 = __webpack_require__(66);
+	var ScalarObservable_1 = __webpack_require__(69);
+	var EmptyObservable_1 = __webpack_require__(70);
 	/**
 	 * We need this JSDoc comment for affecting ESDoc.
 	 * @extends {Ignored}
@@ -68781,7 +69100,7 @@
 	//# sourceMappingURL=ArrayLikeObservable.js.map
 
 /***/ },
-/* 69 */
+/* 73 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -68791,7 +69110,7 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var Subscriber_1 = __webpack_require__(22);
-	var Notification_1 = __webpack_require__(70);
+	var Notification_1 = __webpack_require__(74);
 	/**
 	 * @see {@link Notification}
 	 *
@@ -68861,7 +69180,7 @@
 	//# sourceMappingURL=observeOn.js.map
 
 /***/ },
-/* 70 */
+/* 74 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -68993,20 +69312,20 @@
 	//# sourceMappingURL=Notification.js.map
 
 /***/ },
-/* 71 */
+/* 75 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var ArrayObservable_1 = __webpack_require__(64);
+	var ArrayObservable_1 = __webpack_require__(68);
 	exports.of = ArrayObservable_1.ArrayObservable.of;
 	//# sourceMappingURL=of.js.map
 
 /***/ },
-/* 72 */
+/* 76 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var mergeMap_1 = __webpack_require__(73);
+	var mergeMap_1 = __webpack_require__(77);
 	/* tslint:disable:max-line-length */
 	/**
 	 * Projects each source value to an Observable which is merged in the output
@@ -69077,7 +69396,7 @@
 	//# sourceMappingURL=concatMap.js.map
 
 /***/ },
-/* 73 */
+/* 77 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -69086,8 +69405,8 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var subscribeToResult_1 = __webpack_require__(74);
-	var OuterSubscriber_1 = __webpack_require__(76);
+	var subscribeToResult_1 = __webpack_require__(78);
+	var OuterSubscriber_1 = __webpack_require__(80);
 	/* tslint:disable:max-line-length */
 	/**
 	 * Projects each source value to an Observable which is merged in the output
@@ -69253,17 +69572,17 @@
 	//# sourceMappingURL=mergeMap.js.map
 
 /***/ },
-/* 74 */
+/* 78 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
 	var root_1 = __webpack_require__(20);
 	var isArray_1 = __webpack_require__(25);
-	var isPromise_1 = __webpack_require__(61);
+	var isPromise_1 = __webpack_require__(65);
 	var isObject_1 = __webpack_require__(26);
 	var Observable_1 = __webpack_require__(19);
-	var iterator_1 = __webpack_require__(63);
-	var InnerSubscriber_1 = __webpack_require__(75);
+	var iterator_1 = __webpack_require__(67);
+	var InnerSubscriber_1 = __webpack_require__(79);
 	var observable_1 = __webpack_require__(32);
 	function subscribeToResult(outerSubscriber, result, outerValue, outerIndex) {
 	    var destination = new InnerSubscriber_1.InnerSubscriber(outerSubscriber, outerValue, outerIndex);
@@ -69336,7 +69655,7 @@
 	//# sourceMappingURL=subscribeToResult.js.map
 
 /***/ },
-/* 75 */
+/* 79 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -69377,7 +69696,7 @@
 	//# sourceMappingURL=InnerSubscriber.js.map
 
 /***/ },
-/* 76 */
+/* 80 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -69412,7 +69731,7 @@
 	//# sourceMappingURL=OuterSubscriber.js.map
 
 /***/ },
-/* 77 */
+/* 81 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -69485,7 +69804,7 @@
 	//# sourceMappingURL=every.js.map
 
 /***/ },
-/* 78 */
+/* 82 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -69495,7 +69814,7 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var Subscriber_1 = __webpack_require__(22);
-	var EmptyError_1 = __webpack_require__(79);
+	var EmptyError_1 = __webpack_require__(83);
 	/**
 	 * Emits only the first value (or the first value that meets some condition)
 	 * emitted by the source Observable.
@@ -69642,7 +69961,7 @@
 	//# sourceMappingURL=first.js.map
 
 /***/ },
-/* 79 */
+/* 83 */
 /***/ function(module, exports) {
 
 	"use strict";
@@ -69675,7 +69994,7 @@
 	//# sourceMappingURL=EmptyError.js.map
 
 /***/ },
-/* 80 */
+/* 84 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -69803,7 +70122,7 @@
 	//# sourceMappingURL=reduce.js.map
 
 /***/ },
-/* 81 */
+/* 85 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -69812,8 +70131,8 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var OuterSubscriber_1 = __webpack_require__(76);
-	var subscribeToResult_1 = __webpack_require__(74);
+	var OuterSubscriber_1 = __webpack_require__(80);
+	var subscribeToResult_1 = __webpack_require__(78);
 	/**
 	 * Catches errors on the observable to be handled by returning a new observable or throwing an error.
 	 * @param {function} selector a function that takes as arguments `err`, which is the error, and `caught`, which
@@ -69874,11 +70193,11 @@
 	//# sourceMappingURL=catch.js.map
 
 /***/ },
-/* 82 */
+/* 86 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var mergeAll_1 = __webpack_require__(83);
+	var mergeAll_1 = __webpack_require__(87);
 	/* tslint:disable:max-line-length */
 	/**
 	 * Converts a higher-order Observable into a first-order Observable by
@@ -69935,7 +70254,7 @@
 	//# sourceMappingURL=concatAll.js.map
 
 /***/ },
-/* 83 */
+/* 87 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -69944,8 +70263,8 @@
 	    function __() { this.constructor = d; }
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
-	var OuterSubscriber_1 = __webpack_require__(76);
-	var subscribeToResult_1 = __webpack_require__(74);
+	var OuterSubscriber_1 = __webpack_require__(80);
+	var subscribeToResult_1 = __webpack_require__(78);
 	/**
 	 * Converts a higher-order Observable into a first-order Observable which
 	 * concurrently delivers all values that are emitted on the inner Observables.
@@ -70051,7 +70370,7 @@
 	//# sourceMappingURL=mergeAll.js.map
 
 /***/ },
-/* 84 */
+/* 88 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -70061,7 +70380,7 @@
 	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 	};
 	var Subscriber_1 = __webpack_require__(22);
-	var EmptyError_1 = __webpack_require__(79);
+	var EmptyError_1 = __webpack_require__(83);
 	/* tslint:disable:max-line-length */
 	/**
 	 * Returns an Observable that emits only the last item emitted by the source Observable.
@@ -70175,7 +70494,7 @@
 	//# sourceMappingURL=last.js.map
 
 /***/ },
-/* 85 */
+/* 89 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -70273,7 +70592,7 @@
 	//# sourceMappingURL=filter.js.map
 
 /***/ },
-/* 86 */
+/* 90 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -70289,45 +70608,68 @@
 	var core_1 = __webpack_require__(17);
 	var song_service_1 = __webpack_require__(46);
 	var auth_service_1 = __webpack_require__(51);
+	var data_service_1 = __webpack_require__(50);
 	var SongListComponent = (function () {
-	    function SongListComponent(songService, authService) {
+	    function SongListComponent(songService, authService, dataService) {
 	        this.songService = songService;
 	        this.authService = authService;
+	        this.dataService = dataService;
 	        this.songList = [];
 	    }
 	    SongListComponent.prototype.ngOnInit = function () {
 	        var _this = this;
+	        this.authService.authenticated.subscribe(function (value) {
+	            if (!value) {
+	                _this.dataService.clearFavorites();
+	            }
+	            else {
+	                _this.favoritesFill();
+	            }
+	        });
 	        this.songService.getSongs()
 	            .subscribe(function (songs) {
 	            for (var _i = 0, songs_1 = songs; _i < songs_1.length; _i++) {
 	                var song = songs_1[_i];
 	                _this.songList.push(song);
 	            }
-	            if (_this.authService.isAuthenticated()) {
-	                _this.songService.getFavorites(_this.authService.getCurrentUserID())
-	                    .subscribe(function (favorites) {
-	                    if (favorites) {
-	                        for (var _i = 0, favorites_1 = favorites; _i < favorites_1.length; _i++) {
-	                            var fav = favorites_1[_i];
-	                            for (var _a = 0, _b = _this.songList; _a < _b.length; _a++) {
-	                                var song = _b[_a];
-	                                if (song.id === fav.id) {
-	                                    song.isFavorite = true;
-	                                }
+	        });
+	    };
+	    SongListComponent.prototype.favoritesFill = function () {
+	        var _this = this;
+	        if (this.dataService.getFavorites().length == 0) {
+	            this.songService.getFavorites(this.authService.getCurrentUserID())
+	                .subscribe(function (favorites) {
+	                if (favorites.length > 0) {
+	                    for (var _i = 0, favorites_1 = favorites; _i < favorites_1.length; _i++) {
+	                        var fav = favorites_1[_i];
+	                        for (var _a = 0, _b = _this.songList; _a < _b.length; _a++) {
+	                            var song = _b[_a];
+	                            if (fav.id === song.id) {
+	                                song.isFavorite = true;
 	                            }
 	                        }
 	                    }
-	                });
+	                }
+	            });
+	        }
+	        else {
+	            var dataFavs = this.dataService.getFavorites();
+	            for (var _i = 0, dataFavs_1 = dataFavs; _i < dataFavs_1.length; _i++) {
+	                var fav = dataFavs_1[_i];
+	                for (var _a = 0, _b = this.songList; _a < _b.length; _a++) {
+	                    var song = _b[_a];
+	                    song.isFavorite = (song.id === fav);
+	                }
 	            }
-	        });
+	        }
 	    };
 	    SongListComponent = __decorate([
 	        core_1.Component({
 	            selector: 'song-list',
 	            providers: [song_service_1.SongService],
-	            template: __webpack_require__(87)
+	            template: __webpack_require__(91)
 	        }), 
-	        __metadata('design:paramtypes', [song_service_1.SongService, auth_service_1.AuthService])
+	        __metadata('design:paramtypes', [song_service_1.SongService, auth_service_1.AuthService, data_service_1.DataService])
 	    ], SongListComponent);
 	    return SongListComponent;
 	}());
@@ -70335,13 +70677,13 @@
 
 
 /***/ },
-/* 87 */
+/* 91 */
 /***/ function(module, exports) {
 
 	module.exports = "<section class=\"row\">\r\n    <h1 class=\"col-md-12\">Songs List</h1>\r\n    <song-item class=\"col-lg-3 col-md-6 col-sm-12 col-xs-12\" *ngFor=\"let songItem of songList\" [song]=\"songItem\"></song-item>\r\n</section>";
 
 /***/ },
-/* 88 */
+/* 92 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -70356,7 +70698,7 @@
 	};
 	var core_1 = __webpack_require__(17);
 	var song_service_1 = __webpack_require__(46);
-	var router_1 = __webpack_require__(58);
+	var router_1 = __webpack_require__(62);
 	var SongDetailsComponent = (function () {
 	    function SongDetailsComponent(route, songService) {
 	        this.route = route;
@@ -70375,7 +70717,7 @@
 	    SongDetailsComponent = __decorate([
 	        core_1.Component({
 	            selector: 'song-details',
-	            template: __webpack_require__(89),
+	            template: __webpack_require__(93),
 	            providers: [song_service_1.SongService]
 	        }), 
 	        __metadata('design:paramtypes', [router_1.ActivatedRoute, song_service_1.SongService])
@@ -70386,10 +70728,21 @@
 
 
 /***/ },
-/* 89 */
+/* 93 */
 /***/ function(module, exports) {
 
 	module.exports = "<!--\r\n    <div class=\"row song-details\">\r\n    <div class=\"col-lg-12\">\r\n        <h1><button [routerLink]=\"['/song-list']\" class=\"song-details__button\">\r\n            <span class=\"fa fa-arrow-left\"></span>\r\n        </button>Song Details</h1>\r\n    </div>\r\n    <div class=\"col-lg-6 col-lg-offset-3\">\r\n        <div class=\"row\">\r\n            <div class=\"song-details__icon_container col-lg-12\">\r\n                <i class=\"fa fa-music song-details__icon\"></i>\r\n            </div>\r\n            <div class=\"col-lg-12 text-center\">\r\n                <h2>{{song?.track}}</h2>\r\n            </div>\r\n            <div class=\"col-lg-12 text-center\">\r\n                <h4>{{song?.artist}}</h4>\r\n            </div>\r\n            <div class=\"col-lg-12 text-center\">\r\n                <h4>{{song?.album}}</h4>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>\r\n-->\r\n\r\n<div class=\"row song-details\">\r\n    <div class=\"col-xs-12\">\r\n        <h1>\r\n            <button [routerLink]=\"['/song-list']\" class=\"song-details__button\">\r\n                <span class=\"fa fa-arrow-left\"></span>\r\n            </button>\r\n            Song Details</h1>\r\n    </div>\r\n    <div class=\"col-xs-12\">\r\n        <div class=\"row\">\r\n            <div class=\"col-xs-12 col-sm-12 col-md-4 col-md-offset-2 col-lg-4 col-lg-offset-2 text-center\">\r\n                    <div class=\"fa fa-music song-details__icon\"></div>\r\n            </div>\r\n            <div class=\"col-xs-12 col-sm-12 col-md-4 col-lg-6 song-details--aligner\">\r\n                <div class=\"row\">\r\n                    <div class=\"col-xs-12\">\r\n                        <i class=\"fa fa-music song-details__small-icon\"></i>\r\n                        <span class=\"song-details__header-text\">{{song?.track}}</span>\r\n                    </div>\r\n                    <div class=\"col-xs-12\">\r\n                        <i class=\"fa fa-user song-details__small-icon\"></i>\r\n                        <span class=\"song-details__sub-header-text\">{{song?.artist}} - {{song?.album}}</span>\r\n                    </div>\r\n                    <div class=\"col-xs-12\">\r\n                        <i class=\"fa fa-calendar-o song-details__small-icon\"></i>\r\n                        <span class=\"song-details__secondary-text\">{{song?.year}}</span>\r\n                    </div>\r\n                    <div class=\"col-xs-12\">\r\n                        <i class=\"fa fa-clock-o song-details__small-icon\"></i>\r\n                        <span class=\"song-details__secondary-text\">{{song?.length}}</span>\r\n                    </div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>";
+
+/***/ },
+/* 94 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+	var Observable_1 = __webpack_require__(19);
+	var catch_1 = __webpack_require__(85);
+	Observable_1.Observable.prototype.catch = catch_1._catch;
+	Observable_1.Observable.prototype._catch = catch_1._catch;
+	//# sourceMappingURL=catch.js.map
 
 /***/ }
 /******/ ]);

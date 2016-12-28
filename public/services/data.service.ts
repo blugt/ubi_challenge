@@ -4,14 +4,36 @@ import { Song } from './../models/song';
 @Injectable()
 export class DataService {
 
-    song: Song;
+    currentSong: Song;
+    currentFavorites: Number[] = [];
 
-    getCurrentStored(songID): Song {
-        return this.song;
+    getCurrentStoredSong(songID): Song {
+        return this.currentSong;
     }
 
-    storeNew(song: Song) {
-        this.song = song;
+    storeNewSong(song: Song) {
+        this.currentSong = song;
+    }
+
+    storeFavorite(favs: Number) {
+        this.currentFavorites.push(favs);
+    }
+
+    removeFavorite(id: Number) {
+        let found = this.currentFavorites.findIndex(f => {
+            return f === id;
+        });
+        if(found > -1){
+            this.currentFavorites.splice(found, 1);
+        }
+    }
+
+    clearFavorites() {
+        this.currentFavorites = [];
+    }
+
+    getFavorites(): Number[] {
+        return this.currentFavorites;
     }
 
 }

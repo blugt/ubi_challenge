@@ -66,6 +66,43 @@ router.post('/users', function(req, res, next) {
     if(!('username' in req.body) || !('email' in req.body)){
     	res.statusCode = 400;
     	var statusMessage = "No username or email defined.";
+    } else {
+        var exists = _.find(users, function(user) {
+            return user.email === req.body.email && user.username === req.body.username;
+        });
+        if(exists) {
+            var statusMessage = "User " + req.body.email + " logged in with success!";
+            res.statusCode = 200;
+            var favs = getUserFavorites(exists.id);
+            var favsIDs = [];
+
+            for( index in favs ) {
+                favsIDs.push(favs[index].musicid);
+            }
+
+            res.send({message: statusMessage , 
+                body: {
+                        id: exists.id,
+                        username: exists.username,
+                        email: exists.email,
+                        favorites: favsIDs
+                    }
+                });
+        } else {
+            var newuser = req.body;
+    	    newuser.id = uuid.v4();
+    	    users.push(newuser);
+    	    res.statusCode = 200;
+    	    var statusMessage = "User " + req.body.email + " added with success!";
+            res.send({message: statusMessage , body: newuser});
+        }
+    }
+});
+/*
+router.post('/users', function(req, res, next) {
+    if(!('username' in req.body) || !('email' in req.body)){
+    	res.statusCode = 400;
+    	var statusMessage = "No username or email defined.";
     }
     else{
     	var newuser = req.body;
@@ -76,6 +113,7 @@ router.post('/users', function(req, res, next) {
     }
     res.send({message: statusMessage, body: newuser});
 });
+*/
 
 
 /*
@@ -183,10 +221,8 @@ router.delete('/songs/:id', function(req, res) {
  */
 
 router.get('/users/:userid/songs', function(req, res, next) {
-    
-    var musicids = _.filter(favorites, function(o){
-		return o.userid == req.params.userid;
-    })
+
+    var musicids = getUserFavorites(req.params.userid);
 
     if(musicids.length == 0){
     	res.statusCode = 204;
@@ -227,7 +263,7 @@ router.post('/users/:userid/songs/', function(req, res, next) {
     });
 
     var match = _.find(favorites, function(o){
-        return (o.userid == req.params.userid && o.musicid == req.params.musicid)
+        return (o.userid == req.params.userid && o.musicid == req.body.musicid)
     });
 
     if(!usermatch){
@@ -277,6 +313,15 @@ router.delete('/users/:userid/songs/:musicid', function(req, res) {
         res.send({"message":"Match not found!"});   
     }
 });
+
+
+function getUserFavorites(userid) {
+    var musicids = _.filter(favorites, function(o){
+		return o.userid == userid;
+    });
+
+    return musicids;
+}
 
 // more routes for our API will happen here
 

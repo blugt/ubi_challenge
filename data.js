@@ -5,12 +5,12 @@ var data = {
 		"email" : "test@ubiwhere.com",
 	},{
 		"id": 2,
-		"username" : "Test",
+		"username" : "Test2",
 		"email" : "test@ubiwhere.com",
 	},
 	{
 		"id": 3,
-		"username" : "Test",
+		"username" : "Test3",
 		"email" : "test@ubiwhere.com",
 	}],
 	songs: [{
