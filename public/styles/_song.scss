@@ -84,8 +84,12 @@
         &__titles {
             padding-left: 0px;
             
-            h4 {
-                font-size: 24px;
+            .titles__maintitle {
+                font-size: 18px;
+            }
+
+            .titles__subtitle {
+                font-size: 18px;
             }
         }
 
@@ -113,8 +117,12 @@
         &__titles {
             padding-left: 0px;
             
-            h4 {
-                font-size: 24px;
+            .titles__maintitle {
+                font-size: 16px;
+            }
+
+            .titles__subtitle {
+                font-size: 16px;
             }
         }
     }
