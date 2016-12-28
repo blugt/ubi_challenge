@@ -2,16 +2,19 @@
 
 @media(min-width: $screen-phone) {
   @include grid-xsmall;
+  @include media-xs-login-form;
 }
 
 @media(min-width: $screen-tablet) {
   @include grid-small;
   @include media-sm-details;
+  @include media-sm-login-form;
 }
 
 @media(min-width: $screen-desktop) {
   @include grid-medium;
   @include media-md-details;
+  @include media-md-login-form;
 }
 
 @media(min-width: $screen-lg-desktop) {

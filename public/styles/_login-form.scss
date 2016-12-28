@@ -1,6 +1,5 @@
 .login-form {
-    margin-right: 30px;
-    margin-top: 15px;
+    margin: 15px 15px 0 15px;
 
     input {
         background-color: #111;
@@ -8,5 +7,51 @@
         color: #fff;
         border-radius: 3px;
         border: 1px solid #444; 
+        width: 100%;
     }
+
+    button {
+        width: 100%;
+    }
+
 }
+
+@mixin media-xs-login-form {
+   .login-form {
+
+        input {
+            width: 100px;
+        }
+
+        button {
+            width: 80px;
+        }
+    } 
+}
+
+@mixin media-sm-login-form {
+   .login-form {
+
+        input {
+            width: 200px;
+        }
+
+        button {
+            width: 80px;
+        }
+    } 
+}
+
+@mixin media-md-login-form {
+
+    .login-form {
+
+        input {
+            width: 200px;
+        }
+
+        button {
+            width: 80px;
+        }
+    }
+} 
