@@ -12,13 +12,22 @@
         min-height: 70px;
     }
 
+    &__info_container {
+            margin-top: 15px;
+    }
+
     &__titles {
         padding-left: 15px;
-        
-        h4, h5 {
+        font-size: 16px;
+
+        p {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        .titles__maintitle {
+            margin: 0;
         }
         
         .titles__subtitle {
@@ -53,6 +62,9 @@
             padding-top: 15px;
         }
 
+        &__info_container {
+            margin-top: 10px;
+        }
     }
 }
 
@@ -68,7 +80,7 @@
         }
 
         &__info_container {
-            margin-top: 15px;
+            margin-top: 10px;
         }
 
         &__titles {
@@ -115,7 +127,7 @@
         margin-bottom: 30px;
 
         &__info_container {
-            margin-top: 5px;
+            margin-top: 10px;
         }
 
         &__titles {
