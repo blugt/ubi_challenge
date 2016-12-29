@@ -55,11 +55,6 @@
     .song {
         margin-bottom: 0px;
 
-         &__icon {
-            font-size: 55px;
-            padding-top: 15px;
-        }
-
         &__info_container {
             margin-top: 10px;
         }
@@ -71,25 +66,20 @@
         border-bottom: 0;
         margin-bottom: 10px;
 
-        &__icon {
-            font-size: 75px;
-            padding-bottom: 10px;
-            padding-top: 10px;
-        }
-
         &__info_container {
             margin-top: 10px;
+            padding-left: 15px;
         }
 
         &__titles {
             padding-left: 0px;
             
             .titles__maintitle {
-                font-size: 18px;
+                font-size: 16px;
             }
 
             .titles__subtitle {
-                font-size: 18px;
+                font-size: 16px;
             }
         }
 
@@ -102,12 +92,6 @@
 @mixin grid-medium {
     .song {
         margin-bottom: 30px;
-
-        &__icon {
-            font-size: 125px;
-            padding-bottom: 25px;
-            padding-top: 15px;
-        }
 
         &__info_container {
             margin-top: 10px;
