@@ -19,19 +19,19 @@ export class SongListComponent implements OnInit {
     ngOnInit() {
 
         this._authSubscription = this.authService.isAuthenticated$()
-            .subscribe(value => {
+            .subscribe( (value: boolean) => {
                 if(value){
                     this.songsService.getSongsWithFavorites(this.authService.getCurrentUserId());
                 }else{
                     this.songsService.getSongs();
                 }
-        });
+            } );
 
         
         this.songsService.songs$
-            .subscribe( songs => {
+            .subscribe( (songs: any) => {
                 this.songList = songs;
-        });
+            } );
 
     }
 

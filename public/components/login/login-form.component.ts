@@ -16,10 +16,9 @@ export class LoginFormComponent implements OnInit{
 
     ngOnInit() {
         this.authService.isAuthenticated$()
-            .subscribe((value: boolean) => {
+            .subscribe( (value: boolean) => {
                 this.isLogged = value;
-            });
-
+            } );
     }
 
     userLogin() {

@@ -13,21 +13,21 @@ export class AuthService {
         this._authenticated  = new BehaviorSubject(this.checkStorage());
     }
 
-    login(username: String, email: String){
+    login(username: string, email: string){
 
         return this.http.post(`${this._apiURL}/users`, {email: email, username: username})
-            .map(response => response.json())
-            .subscribe((json) => {
+            .map( (response) => response.json())
+            .subscribe( (json) => {
                 if(json.body) {
                     let user = { username: json.body.username, id: json.body.id };
-                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    sessionStorage.setItem('currentUser', JSON.stringify(user));
                     this._authenticated.next(this.checkStorage());
                 }
-            });
+            } );
     }
 
-    checkStorage():boolean {
-        return localStorage.getItem('currentUser') !== null;
+    checkStorage(): boolean {
+        return sessionStorage.getItem('currentUser') !== null;
     }
 
     isAuthenticated$(): BehaviorSubject<boolean> {
@@ -35,15 +35,15 @@ export class AuthService {
     }
 
     getCurrentUsername(): string {
-        return JSON.parse(localStorage.getItem('currentUser')).username;
+        return JSON.parse(sessionStorage.getItem('currentUser')).username;
     }
 
     getCurrentUserId(): string {
-        return JSON.parse(localStorage.getItem('currentUser')).id;
+        return JSON.parse(sessionStorage.getItem('currentUser')).id;
     }
 
     logout() {
-        localStorage.removeItem('currentUser');
+        sessionStorage.removeItem('currentUser');
         this._authenticated.next(this.checkStorage());
     }
 

@@ -60038,7 +60038,7 @@
 	var core_1 = __webpack_require__(20);
 	var AppComponent = (function () {
 	    function AppComponent() {
-	        this.title = 'Song List App';
+	        this.title = 'Spotisong';
 	    }
 	    AppComponent = __decorate([
 	        core_1.Component({
@@ -60089,9 +60089,6 @@
 	            _this.userLogged = value;
 	        });
 	    };
-	    SongComponent.prototype.storeSongDetails = function () {
-	        //this.dataService.storeNewSong(this.song);
-	    };
 	    SongComponent.prototype.addFavorite = function () {
 	        var _this = this;
 	        var uid = this.authService.getCurrentUserId();
@@ -60099,12 +60096,17 @@
 	            .subscribe(function (response) {
 	            _this.song.isFavorite = response;
 	        }, function (error) {
+	            //Needs a notification system.
 	            console.log(error);
 	        });
 	    };
 	    SongComponent.prototype.removeFavorite = function () {
+	        var _this = this;
 	        var uid = this.authService.getCurrentUserId();
-	        this.songsService.removeFavorite(uid, this.song.id);
+	        this.songsService.removeFavorite(uid, this.song.id)
+	            .subscribe(function (response) {
+	            _this.song.isFavorite = !response;
+	        });
 	    };
 	    SongComponent.prototype.setFavorite = function (event) {
 	        event.stopPropagation();
@@ -60183,25 +60185,25 @@
 	            .subscribe(function (json) {
 	            if (json.body) {
 	                var user = { username: json.body.username, id: json.body.id };
-	                localStorage.setItem('currentUser', JSON.stringify(user));
+	                sessionStorage.setItem('currentUser', JSON.stringify(user));
 	                _this._authenticated.next(_this.checkStorage());
 	            }
 	        });
 	    };
 	    AuthService.prototype.checkStorage = function () {
-	        return localStorage.getItem('currentUser') !== null;
+	        return sessionStorage.getItem('currentUser') !== null;
 	    };
 	    AuthService.prototype.isAuthenticated$ = function () {
 	        return this._authenticated;
 	    };
 	    AuthService.prototype.getCurrentUsername = function () {
-	        return JSON.parse(localStorage.getItem('currentUser')).username;
+	        return JSON.parse(sessionStorage.getItem('currentUser')).username;
 	    };
 	    AuthService.prototype.getCurrentUserId = function () {
-	        return JSON.parse(localStorage.getItem('currentUser')).id;
+	        return JSON.parse(sessionStorage.getItem('currentUser')).id;
 	    };
 	    AuthService.prototype.logout = function () {
-	        localStorage.removeItem('currentUser');
+	        sessionStorage.removeItem('currentUser');
 	        this._authenticated.next(this.checkStorage());
 	    };
 	    AuthService = __decorate([
@@ -62424,9 +62426,7 @@
 	        this.http = http;
 	        this._apiUrl = '/api';
 	        this._songs = new Rx.Subject();
-	        this._favorites = new Rx.Subject();
 	        this.songs$ = this._songs.asObservable();
-	        this.favorites$ = this._favorites.asObservable();
 	    }
 	    SongsService.prototype.getSongs = function () {
 	        var _this = this;
@@ -62440,13 +62440,11 @@
 	            .map(function (response) { return response.json(); })
 	            .flatMap(function (songsList) {
 	            var fJoin = Rx.Observable.forkJoin(Rx.Observable.of(songsList), _this.getFavorites(uid));
-	            console.log(fJoin);
 	            return fJoin;
 	        })
 	            .map(function (fullSongs) {
 	            var songs = fullSongs[0];
 	            var favorites = fullSongs[1];
-	            console.log("here");
 	            var _loop_1 = function(song) {
 	                if (favorites.find(function (fav) { return song.id === fav.id; })) {
 	                    song.isFavorite = true;
@@ -62456,7 +62454,6 @@
 	                var song = songs_1[_i];
 	                _loop_1(song);
 	            }
-	            console.log(songs);
 	            return songs;
 	        })
 	            .subscribe(function (songs) {
@@ -62480,16 +62477,19 @@
 	    };
 	    SongsService.prototype.removeFavorite = function (uid, sid) {
 	        return this.http.delete(this._apiUrl + "/users/" + uid + "/songs/" + sid)
-	            .map(function (response) { return response.status === 200; });
-	    };
-	    SongsService.prototype.emptyFavorites = function () {
-	        this._favorites.next([]);
+	            .map(function (response) { return response.status === 200; })
+	            .catch(this.errorHandling);
 	    };
 	    SongsService.prototype.errorHandling = function (error) {
 	        if (error instanceof http_1.Response) {
+	            var errorText = '';
 	            if (error.status === 409) {
-	                return Rx.Observable.throw('Favorite already added');
+	                errorText = 'Favorite already added';
 	            }
+	            else if (error.status === 404) {
+	                errorText = 'Couldn\'t remove favorite';
+	            }
+	            return Rx.Observable.throw(errorText);
 	        }
 	    };
 	    SongsService = __decorate([

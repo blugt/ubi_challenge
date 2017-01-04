@@ -15,13 +15,12 @@ export class SongDetailsComponent implements OnInit {
     constructor(private route: ActivatedRoute, private songsService: SongsService, private authService: AuthService ) {}
 
     ngOnInit() {
-
         let id = this.route.snapshot.params['id'];
 
         this.songsService.getSong(id)
-            .subscribe( response => {
+            .subscribe( (response: any) => {
                 this.song = response;
-            })
+            } );
     }
     
 }
