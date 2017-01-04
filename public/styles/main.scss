@@ -9,6 +9,8 @@ $navbar-default-color: #111;
 
 @import '../../node_modules/bootstrap-sass/assets/stylesheets/bootstrap';
 @import '../../node_modules/font-awesome/scss/font-awesome';
+@import './mixins';
+@import './fonts';
 @import './song';
 @import './song-details';
 @import './login-form';

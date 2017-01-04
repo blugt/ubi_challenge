@@ -19,6 +19,8 @@
 
     &__titles {
         font-size: 16px;
+        font-family: Muli;
+        font-weight: 200;
 
         p {
             white-space: nowrap;
@@ -131,10 +133,6 @@
             border: 0;
             background-color: transparent;
             font-size: 2.5em;
-        }
-
-        footer {
-            text-align: center;
         }
     }
 }

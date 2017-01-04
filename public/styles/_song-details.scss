@@ -17,17 +17,21 @@
     }
 
     &__header-text {
+        font-family: Muli;
         font-weight: 700;
         font-size: 48px;
     }
 
     &__sub-header-text {
         font-size: 16px;
+        font-family: Muli;
+        font-weight: 400;
     }
 
     &__secondary-text {
         color: #555;
         font-size: 16px;
+        font-weight: 200;
     }
 
     &__button {
