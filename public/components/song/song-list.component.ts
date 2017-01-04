@@ -18,48 +18,25 @@ export class SongListComponent implements OnInit {
 
     ngOnInit() {
 
-        this.songsService.getSongs()
-            .subscribe( songs => {
-                for(let song of songs ) {
-                    this.songList.push(song);
-                }
-                if(this.authService.isAuthenticated$().value) {
-                    this.getFavorites();
+        this._authSubscription = this.authService.isAuthenticated$()
+            .subscribe(value => {
+                if(value){
+                    this.songsService.getSongsWithFavorites(this.authService.getCurrentUserId());
+                }else{
+                    this.songsService.getSongs();
                 }
         });
 
-        this._authSubscription = this.authService.isAuthenticated$()
-            .subscribe((value: boolean) => {
-                if(value) {
-                    this.getFavorites();
-                } else {
-                    for(let song of this.songList) {
-                        song.isFavorite = false;
-                    }
-                }
-            });
+        
+        this.songsService.songs$
+            .subscribe( songs => {
+                this.songList = songs;
+        });
 
     }
 
     ngOnDestroy() {
         this._authSubscription.unsubscribe();
-    }
-
-    getFavorites() {
-
-        this.songsService.getFavorites(this.authService.getCurrentUserId())
-            .subscribe( favorites => {
-                if(favorites.length != 0){
-                    for(let fav of favorites) {
-                        for( let song of this.songList){
-                            if(fav.id === song.id) {
-                                song.isFavorite = true;
-                            }
-                        }
-                    }
-                }
-            });
-
     }
 
 }

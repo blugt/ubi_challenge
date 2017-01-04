@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { User } from '../../models/user';
 import { AuthService } from '../../services/auth.service';
+import { SongsService } from '../../services/songs.service';
 
 @Component({
     selector: 'login-form',
@@ -11,7 +12,7 @@ export class LoginFormComponent implements OnInit{
     user: User = new User('','','');
     isLogged: boolean = false;
 
-    constructor(private authService: AuthService) {}
+    constructor(private authService: AuthService, private songsService: SongsService) {}
 
     ngOnInit() {
         this.authService.isAuthenticated$()

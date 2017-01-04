@@ -30,19 +30,17 @@ export class SongComponent {
         this.songsService.addFavorite(uid, this.song.id)
             .subscribe((response: boolean) => {
                 this.song.isFavorite = response;
-
+            }
+            , error => {
+                console.log(error);
             });
         
     }
 
     removeFavorite() {
-       /**
-         this.songService.removeFavorite(localStorage.getItem('currentUserID'), this.song.id)
-            .subscribe((response: boolean) => {
-                this.song.isFavorite = !response;
-                this.dataService.removeFavorite(this.song.id);
-            });
-            */
+        let uid = this.authService.getCurrentUserId();
+        this.songsService.removeFavorite(uid, this.song.id);
+            
     }
 
     setFavorite(event) {

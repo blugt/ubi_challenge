@@ -15,7 +15,7 @@ export class AuthService {
 
     login(username: String, email: String){
 
-        this.http.post(`${this._apiURL}/users`, {email: email, username: username})
+        return this.http.post(`${this._apiURL}/users`, {email: email, username: username})
             .map(response => response.json())
             .subscribe((json) => {
                 if(json.body) {
