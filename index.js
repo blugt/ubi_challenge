@@ -74,28 +74,26 @@ router.post('/users', function(req, res, next) {
         if(exists) {
             var statusMessage = "User " + req.body.email + " logged in with success!";
             res.statusCode = 200;
-            var favs = getUserFavorites(exists.id);
-            var favsIDs = [];
-
-            for( index in favs ) {
-                favsIDs.push(favs[index].musicid);
-            }
-
-            res.send({message: statusMessage , 
-                body: {
-                        id: exists.id,
-                        username: exists.username,
-                        email: exists.email,
-                        favorites: favsIDs
-                    }
-                });
+            res.send({message: statusMessage 
+                , body: {
+                    id: exists.id,
+                    username: exists.username,
+                    email: exists.email
+                }
+            });
         } else {
             var newuser = req.body;
     	    newuser.id = uuid.v4();
     	    users.push(newuser);
     	    res.statusCode = 200;
     	    var statusMessage = "User " + req.body.email + " added with success!";
-            res.send({message: statusMessage , body: newuser});
+            res.send({message: statusMessage 
+                , body: {
+                    id: newuser.id,
+                    username: newuser.username,
+                    email: newuser.email
+                }
+            });
         }
     }
 });
@@ -167,7 +165,7 @@ router.get('/songs/:id', function(req, res) {
     else{
 		res.statusCode = 204;
     }
-    res.send(music);
+    res.send(music[0]);
     
 });
 
@@ -224,12 +222,12 @@ router.delete('/songs/:id', function(req, res) {
 router.get('/users/:userid/songs', function(req, res, next) {
 
     var musicids = getUserFavorites(req.params.userid);
+    var usersongs = [];
 
     if(musicids.length == 0){
     	res.statusCode = 204;
     	res.send({body: usersongs})
     }else{
-        var usersongs = [];
 
         for(id in musicids){
             var music = _.find(songs, function(o){

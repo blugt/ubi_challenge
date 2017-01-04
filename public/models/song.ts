@@ -1,17 +1,17 @@
 export class Song {
 
-        id: Number;
-        album: String;
-        artist: String;
-        track: String;
-        length: String;
+        id: string;
+        album: string;
+        artist: string;
+        track: string;
+        length: string;
         year: Number;
-        thumb: String;
+        thumb: string;
         isFavorite: boolean;
 
-        constructor(id: Number, album: String
-                    , artist: String, track: String
-                    , isFav: boolean, length: String, year: Number, thumb: String){
+        constructor(id: string, album: string
+                    , artist: string, track: string
+                    , isFav: boolean, length: string, year: Number, thumb: string){
             
             this.id = id;
             this.album = album;

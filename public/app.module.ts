@@ -8,8 +8,8 @@ import { AppRoutingModule, routingComponents } from './app.routing';
 
 import { APP_BASE_HREF } from '@angular/common';
 import { HttpModule } from '@angular/http';
-import { DataService } from './services/data.service';
 import { AuthService } from './services/auth.service';
+import { SongsService } from './services/songs.service';
 
 @NgModule({
     imports: [
@@ -26,8 +26,8 @@ import { AuthService } from './services/auth.service';
     ],
     providers: [
         {provide: APP_BASE_HREF, useValue : '/' },
-        DataService,
-        AuthService
+        AuthService,
+        SongsService
     ],
     bootstrap: [ AppComponent ]
 })

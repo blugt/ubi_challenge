@@ -1,63 +1,65 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { SongComponent } from './song.component';
-import { SongService } from './../../services/song.service';
+import { SongsService } from './../../services/songs.service';
 import { AuthService } from './../../services/auth.service';
-import { DataService } from './../../services/data.service';
 import { Song } from '../../models/song';
 
 
 @Component({
     selector: 'song-list',
-    providers: [SongService],
     templateUrl: '/song-list.component.html'
 })
 export class SongListComponent implements OnInit {
     
     songList: Song[] = [];
+    private _authSubscription;
 
-    constructor(private songService: SongService, private authService: AuthService, private dataService: DataService) {}
+    constructor(private songsService: SongsService, private authService: AuthService) {}
 
     ngOnInit() {
 
-        this.authService.authenticated.subscribe((value: boolean) => {
-            if(!value) {
-                this.dataService.clearFavorites();
-            } else {
-                this.favoritesFill();
-            }
-        });
-
-        this.songService.getSongs()
+        this.songsService.getSongs()
             .subscribe( songs => {
                 for(let song of songs ) {
                     this.songList.push(song);
                 }
+                if(this.authService.isAuthenticated$().value) {
+                    this.getFavorites();
+                }
         });
+
+        this._authSubscription = this.authService.isAuthenticated$()
+            .subscribe((value: boolean) => {
+                if(value) {
+                    this.getFavorites();
+                } else {
+                    for(let song of this.songList) {
+                        song.isFavorite = false;
+                    }
+                }
+            });
 
     }
 
-    favoritesFill() {
+    ngOnDestroy() {
+        this._authSubscription.unsubscribe();
+    }
 
-        if(this.dataService.getFavorites().length == 0){
-            this.songService.getFavorites(this.authService.getCurrentUserID())
-                .subscribe( favorites => {
-                    if(favorites.length > 0){
-                        for(let fav of favorites){
-                            for( let song of this.songList){
-                                if(fav.id === song.id) {
-                                    song.isFavorite = true;
-                                }
+    getFavorites() {
+
+        this.songsService.getFavorites(this.authService.getCurrentUserId())
+            .subscribe( favorites => {
+                if(favorites.length != 0){
+                    for(let fav of favorites) {
+                        for( let song of this.songList){
+                            if(fav.id === song.id) {
+                                song.isFavorite = true;
                             }
                         }
-                    }});        
-        } else {
-            let dataFavs = this.dataService.getFavorites();
-            for(let fav of dataFavs){
-                for( let song of this.songList){
-                    song.isFavorite = (song.id === fav);
+                    }
                 }
-            }
-        }
+            });
+
     }
 
 }

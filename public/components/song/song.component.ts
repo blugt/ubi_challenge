@@ -1,12 +1,10 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { Song } from './../../models/song';
-import { SongService } from './../../services/song.service';
-import { DataService } from './../../services/data.service';
 import { AuthService } from './../../services/auth.service';
+import { SongsService } from './../../services/songs.service';
 
 @Component({
     selector: 'song-item',
-    providers: [SongService],
     templateUrl: 'song.component.html'
 })
 export class SongComponent {
@@ -14,42 +12,37 @@ export class SongComponent {
     @Input('song') song: Song;
     private userLogged = false;
 
-    constructor(private songService: SongService, private authService: AuthService, private dataService: DataService) {}
+    constructor(private authService: AuthService, private songsService: SongsService) {}
 
     ngOnInit() {
-        this.authService.authenticated.subscribe((value: boolean) => {
-            this.userLogged = value;
-            if(!value) {
-                this.song.isFavorite = false;
-            } else {
-                let found = this.dataService.getFavorites().find( favorite => {
-                    return favorite === this.song.id;
-                });
-                if(found){
-                    this.song.isFavorite = true;
-                }
-            }
-        });
-    }
-
-    storeSongDetails() {
-         this.dataService.storeNewSong(this.song);
-    }
-
-    addFavorite() {
-        this.songService.addFavorite(localStorage.getItem('currentUserID'), this.song.id)
-            .subscribe((response: boolean) => {
-                this.song.isFavorite = response;
-                this.dataService.storeFavorite(this.song.id);
+        this.authService.isAuthenticated$()
+            .subscribe((value: boolean) => {
+                this.userLogged = value;
             });
     }
 
+    storeSongDetails() {
+         //this.dataService.storeNewSong(this.song);
+    }
+
+    addFavorite() {
+        let uid = this.authService.getCurrentUserId();
+        this.songsService.addFavorite(uid, this.song.id)
+            .subscribe((response: boolean) => {
+                this.song.isFavorite = response;
+
+            });
+        
+    }
+
     removeFavorite() {
-        this.songService.removeFavorite(localStorage.getItem('currentUserID'), this.song.id)
+       /**
+         this.songService.removeFavorite(localStorage.getItem('currentUserID'), this.song.id)
             .subscribe((response: boolean) => {
                 this.song.isFavorite = !response;
                 this.dataService.removeFavorite(this.song.id);
             });
+            */
     }
 
     setFavorite(event) {
